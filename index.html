@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Convoca — MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F5F3; --card:#FFFFFF; --ink:#0F1A15; --body:#4B5751; --muted:#828C86;
+    --line:#E5E8E5; --line2:#EFF1EF;
+    --primary:#0F3D2E; --primary-2:#185640; --primary-soft:#E7EFEA;
+    --accent:#E8542B; --accent-soft:#FDEDE7; --accent-ink:#B83A14;
+    --ok:#2C7A4B; --ok-soft:#E6F2EA;
+    --r:16px; --shadow:0 1px 2px rgba(15,26,21,.05), 0 2px 8px rgba(15,26,21,.04);
+    --sans:'Inter',system-ui,sans-serif; --brand:'Archivo',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{ font-family:var(--sans); background:#E3E7E4; color:var(--ink);
+    display:flex; justify-content:center; align-items:center; min-height:100dvh;
+    -webkit-font-smoothing:antialiased; font-feature-settings:'cv11','ss01'; }
+  button,input,select,textarea{ font-family:inherit; }
+  .phone{ width:100%; max-width:430px; height:min(896px,100dvh); background:var(--bg);
+    position:relative; overflow:hidden; display:flex; flex-direction:column; }
+  @media(min-width:480px){ .phone{ border-radius:40px; height:896px; box-shadow:0 30px 80px rgba(15,26,21,.18), 0 0 0 1px rgba(15,26,21,.06); } }
+
+  /* app bar */
+  .top{ flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px 12px; padding-top:calc(16px + env(safe-area-inset-top,0px));
+    background:rgba(244,245,243,.92); backdrop-filter:blur(12px); border-bottom:1px solid transparent; }
+  .brand{ font-family:var(--brand); font-weight:800; font-size:22px; letter-spacing:-.6px; color:var(--primary); display:flex; align-items:center; gap:8px; }
+  .brand i{ font-style:normal; color:var(--accent); }
+  .tag-mvp{ font-family:var(--sans); font-size:10.5px; font-weight:600; letter-spacing:.6px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:2px 6px; }
+  .top-r{ display:flex; align-items:center; gap:8px; }
+  .loc{ display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:20px; padding:6px 11px 6px 9px; }
+  .loc .ico{ width:14px; height:14px; color:var(--primary); }
+  .iconbtn{ width:34px; height:34px; border-radius:17px; border:1px solid var(--line); background:var(--card); display:flex; align-items:center; justify-content:center; color:var(--ink); cursor:pointer; position:relative; }
+  .iconbtn .ico{ width:17px; height:17px; }
+  .iconbtn .dot{ position:absolute; top:7px; right:8px; width:7px; height:7px; border-radius:7px; background:var(--accent); border:1.5px solid #fff; }
+
+  .screen{ flex:1; overflow-y:auto; padding:6px 20px 28px; display:none; }
+  .screen.on{ display:block; }
+  .screen::-webkit-scrollbar{ width:0; }
+  .h1{ font-size:28px; font-weight:700; letter-spacing:-.7px; margin:6px 0 4px; line-height:1.15; }
+  .sub{ font-size:14px; color:var(--body); margin:0 0 18px; line-height:1.5; }
+  .sec{ display:flex; align-items:baseline; justify-content:space-between; margin:22px 0 10px; }
+  .sec h3{ margin:0; font-size:15px; font-weight:700; letter-spacing:-.2px; }
+  .sec span{ font-size:12.5px; color:var(--muted); font-weight:500; }
+
+  .search{ display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0 12px; height:44px; margin-bottom:12px; color:var(--muted); }
+  .search .ico{ width:18px; height:18px; }
+  .search input{ border:none; outline:none; flex:1; font-size:14.5px; color:var(--ink); background:none; }
+
+  .chips{ display:flex; gap:6px; overflow-x:auto; margin:0 -20px 6px; padding:0 20px 6px; }
+  .chips::-webkit-scrollbar{ display:none; }
+  .seg{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{ flex:none; display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); background:var(--card); color:var(--body);
+    height:34px; padding:0 12px; border-radius:10px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap; transition:.15s; }
+  .chip:hover{ border-color:#CDD3CF; }
+  .chip .ico{ width:15px; height:15px; }
+  .chip.sel{ background:var(--primary); color:#fff; border-color:var(--primary); }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); margin-bottom:12px; overflow:hidden; }
+  .cb{ padding:16px; }
+  .row{ display:flex; gap:12px; align-items:flex-start; }
+  .tile{ width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .tile svg{ width:24px; height:24px; }
+  .ctitle{ font-size:15.5px; font-weight:650; font-weight:600; letter-spacing:-.2px; line-height:1.3; }
+  .meta{ font-size:13px; color:var(--body); margin-top:2px; line-height:1.45; }
+  .price{ text-align:right; flex:none; }
+  .price b{ display:block; font-size:16px; font-weight:700; letter-spacing:-.3px; }
+  .price span{ font-size:11.5px; color:var(--muted); }
+  .price.free b{ color:var(--ok); }
+
+  .tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+  .t{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:500; color:var(--body); background:var(--line2); border-radius:7px; padding:4px 8px; }
+  .t .ico{ width:13px; height:13px; color:var(--muted); }
+  .t.hot{ background:var(--accent-soft); color:var(--accent-ink); font-weight:600; }
+  .t.me{ background:var(--primary-soft); color:var(--primary); font-weight:600; }
+
+  .foot{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-top:1px solid var(--line2); background:#FCFCFB; }
+  .prog{ flex:1; min-width:0; }
+  .prog-top{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--body); }
+  .prog-top b{ color:var(--ink); font-weight:600; }
+  .prog-top .ico{ width:15px; height:15px; color:var(--muted); }
+  .bar{ height:4px; border-radius:4px; background:var(--line2); overflow:hidden; margin-top:7px; max-width:150px; }
+  .bar>i{ display:block; height:100%; background:var(--primary); border-radius:4px; }
+  .stack{ display:flex; }
+  .stack span{ width:22px; height:22px; border-radius:11px; border:2px solid #fff; margin-left:-6px; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; color:#fff; }
+  .stack span:first-child{ margin-left:0; }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1px solid transparent; border-radius:10px; height:38px; padding:0 14px; font-weight:600; font-size:13.5px; cursor:pointer; white-space:nowrap; transition:.15s; }
+  .btn .ico{ width:16px; height:16px; }
+  .btn.pri{ background:var(--primary); color:#fff; }
+  .btn.pri:hover{ background:var(--primary-2); }
+  .btn.out{ background:var(--card); color:var(--ink); border-color:var(--line); }
+  .btn.out:hover{ border-color:#CDD3CF; }
+  .btn.done{ background:var(--ok-soft); color:var(--ok); cursor:default; }
+  .btn.off{ background:var(--line2); color:var(--muted); cursor:default; }
+  .btn.ghost{ background:none; color:var(--body); }
+  .wide{ width:100%; height:48px; border-radius:12px; font-size:15px; margin-top:16px; }
+
+  .who{ display:flex; align-items:center; gap:10px; }
+  .av{ width:32px; height:32px; border-radius:16px; color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .who-n{ font-size:13.5px; font-weight:600; }
+  .who-s{ font-size:12px; color:var(--muted); display:flex; align-items:center; gap:4px; }
+  .who-s .ico{ width:13px; height:13px; color:var(--ok); }
+  .rel{ color:var(--ok); font-weight:600; }
+
+  .panel{ background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:18px 16px; margin-bottom:8px; }
+  .label{ font-size:12.5px; font-weight:600; color:var(--body); margin:16px 0 7px; }
+  .label:first-child{ margin-top:0; }
+  .seg + .two .label, .seg + .label{ margin-top:18px; }
+  .field{ width:100%; height:44px; border:1px solid var(--line); border-radius:10px; padding:0 12px; font-size:14.5px; background:#fff; color:var(--ink); outline:none; transition:.15s; appearance:none; -webkit-appearance:none; }
+  select.field{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23828C86' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; background-size:18px; padding-right:34px; }
+  .field:focus{ border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+  textarea.field{ height:auto; min-height:84px; padding:10px 12px; line-height:1.45; resize:none; display:block; }
+  .count{ font-size:11.5px; color:var(--muted); text-align:right; margin-top:5px; }
+  .desc{ font-size:13px; color:var(--body); line-height:1.5; margin-top:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .field::placeholder{ color:#A3ABA6; }
+  .two{ display:flex; gap:10px; }
+  .two > div{ flex:1; min-width:0; }
+  .hint{ display:flex; gap:10px; align-items:center; background:var(--primary-soft); border-radius:10px; padding:11px 12px; font-size:13px; color:var(--primary); margin-top:14px; line-height:1.4; }
+  .hint .ico{ width:18px; height:18px; flex:none; }
+  .note{ font-size:12.5px; color:var(--muted); line-height:1.5; }
+
+  .back{ display:inline-flex; align-items:center; gap:4px; border:none; background:none; color:var(--body); font-size:14px; font-weight:600; padding:4px 0; cursor:pointer; margin-top:2px; }
+  .back .ico{ width:18px; height:18px; }
+
+  /* perfil */
+  .pcard{ display:flex; align-items:center; gap:14px; }
+  .pav{ width:60px; height:60px; border-radius:30px; background:var(--primary); color:#fff; font-weight:700; font-size:24px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .pname{ font-size:19px; font-weight:700; letter-spacing:-.3px; }
+  .verified{ display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ok); background:var(--ok-soft); border-radius:6px; padding:3px 7px; margin-top:5px; }
+  .verified .ico{ width:13px; height:13px; }
+  .stats{ display:flex; border-top:1px solid var(--line2); }
+  .stat{ flex:1; padding:14px 8px; text-align:center; }
+  .stat + .stat{ border-left:1px solid var(--line2); }
+  .stat b{ font-size:20px; font-weight:700; letter-spacing:-.4px; display:block; }
+  .stat span{ font-size:12px; color:var(--muted); }
+  .list .li{ display:flex; align-items:center; gap:12px; padding:12px 16px; }
+  .list .li + .li{ border-top:1px solid var(--line2); }
+  .list .tile{ width:38px; height:38px; border-radius:10px; }
+  .list .tile svg{ width:21px; height:21px; }
+  .li-t{ font-size:14px; font-weight:600; }
+  .li-m{ font-size:12.5px; color:var(--muted); margin-top:1px; }
+  .lvl{ margin-left:auto; font-size:12px; font-weight:600; color:var(--body); background:var(--line2); border-radius:7px; padding:4px 8px; }
+  .empty{ text-align:center; color:var(--muted); font-size:13.5px; padding:28px 20px; line-height:1.55; }
+  .empty .ico{ width:28px; height:28px; color:#B9C1BC; display:block; margin:0 auto 8px; }
+
+  /* mapa */
+  .minimap{ border-radius:var(--r); overflow:hidden; border:1px solid var(--line); margin-bottom:14px; background:#EEF1EE; box-shadow:var(--shadow); }
+  .minimap > svg{ display:block; width:100%; height:auto; }
+
+  /* tab bar + fab */
+  .tabs{ flex:none; display:flex; background:rgba(255,255,255,.96); backdrop-filter:blur(12px); border-top:1px solid var(--line); padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px)); }
+  .tab{ flex:1; border:none; background:none; padding:4px 0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); }
+  .tab .ic{ width:56px; height:30px; border-radius:15px; display:flex; align-items:center; justify-content:center; transition:.2s; }
+  .tab .ic svg{ width:21px; height:21px; }
+  .tab .tl{ font-size:11px; font-weight:600; }
+  .tab.on{ color:var(--primary); }
+  .tab.on .ic{ background:var(--primary-soft); }
+  .fab{ position:absolute; right:20px; bottom:88px; height:50px; padding:0 18px 0 15px; border-radius:16px; border:none; background:var(--primary); color:#fff; font-size:14.5px; font-weight:600; display:none; align-items:center; gap:8px; cursor:pointer; box-shadow:0 8px 24px rgba(15,61,46,.28); }
+  .fab .ico{ width:20px; height:20px; }
+  .fab.show{ display:flex; }
+  .ico{ display:inline-flex; flex:none; }
+  .ico svg{ width:100%; height:100%; }
+
+  .toast{ position:absolute; left:20px; right:20px; top:72px; background:var(--ink); color:#fff; display:flex; align-items:center; gap:10px;
+    padding:12px 14px; border-radius:12px; font-size:13.5px; font-weight:500; line-height:1.4;
+    opacity:0; transform:translateY(-8px); transition:.25s; pointer-events:none; box-shadow:0 10px 30px rgba(15,26,21,.25); z-index:5; }
+  .toast .ico{ width:18px; height:18px; color:#8FD3A8; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  /* tipo de publicação */
+  .segc{ display:flex; background:#E9ECE9; border-radius:11px; padding:3px; margin-bottom:12px; }
+  .segc button{ flex:1; border:none; background:none; height:32px; border-radius:8px; font-size:12.5px; font-weight:600; color:var(--body); cursor:pointer; white-space:nowrap; }
+  .segc button.on{ background:#fff; color:var(--ink); box-shadow:0 1px 3px rgba(15,26,21,.1); }
+  .kind{ display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; margin-bottom:12px; }
+  .kind .ico{ width:14px; height:14px; }
+  .kind.g{ color:var(--primary); } .kind.p{ color:var(--accent-ink); }
+  .choice{ display:flex; gap:14px; align-items:center; width:100%; text-align:left; background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 14px 18px 16px; margin-bottom:12px; cursor:pointer; box-shadow:var(--shadow); color:var(--ink); transition:.15s; }
+  .choice:hover{ border-color:var(--primary); }
+  .choice .tile{ align-self:flex-start; }
+  .ch-t{ font-size:16px; font-weight:700; letter-spacing:-.2px; }
+  .ch-d{ font-size:13.5px; color:var(--body); margin-top:4px; line-height:1.45; }
+  .ch-e{ font-size:12.5px; color:var(--muted); margin-top:8px; }
+  .ch-c{ width:20px; height:20px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="top">
+    <div class="brand"><span>Convoca<i>.</i></span><span class="tag-mvp">MVP</span></div>
+    <div class="top-r">
+      <span class="loc"><span class="ico" data-i="pin"></span>Lisboa</span>
+      <button class="iconbtn" aria-label="Notificações" onclick="toast('Sem notificações novas')"><span class="ico" data-i="bell"></span><span class="dot"></span></button>
+    </div>
+  </div>
+
+  <!-- EXPLORAR -->
+  <div class="screen on" id="s-perto" style="padding-bottom:90px;">
+    <div class="h1">Perto de ti</div>
+    <div class="sub">Grupos com vagas e pessoas à procura de companhia para treinar.</div>
+    <label class="search"><span class="ico" data-i="search"></span><input id="q" placeholder="Procurar desporto, local ou descrição"></label>
+    <div class="segc" id="kindSeg">
+      <button data-k="tudo" class="on">Tudo</button>
+      <button data-k="grupo">Grupos com vagas</button>
+      <button data-k="parceiro">Procuram parceiro</button>
+    </div>
+    <div class="chips" id="filters"></div>
+    <div class="sec"><h3>Esta semana</h3><span id="count"></span></div>
+    <div id="feed"></div>
+  </div>
+
+  <!-- PUBLICAR: escolha -->
+  <div class="screen" id="s-publicar">
+    <button class="back" onclick="go('perto')"><span class="ico" data-i="back"></span>Voltar</button>
+    <div class="h1">Publicar</div>
+    <div class="sub">O que precisas?</div>
+    <button class="choice" onclick="go('criar')">
+      <div class="tile" style="background:var(--primary-soft);color:var(--primary)"><span class="ico" data-i="users" style="width:24px;height:24px"></span></div>
+      <div style="flex:1;">
+        <div class="ch-t">Já tenho plano, faltam pessoas</div>
+        <div class="ch-d">Sabes onde e quando. Abres vagas e quem estiver perto junta-se.</div>
+        <div class="ch-e">Ex.: futebol 5 terça às 21h, faltam 3</div>
+      </div>
+      <span class="ico ch-c" data-i="chev"></span>
+    </button>
+    <button class="choice" onclick="go('pedir')">
+      <div class="tile" style="background:var(--accent-soft);color:var(--accent-ink)"><span class="ico" data-i="usearch" style="width:24px;height:24px"></span></div>
+      <div style="flex:1;">
+        <div class="ch-t">Quero companhia para ir</div>
+        <div class="ch-d">Ainda não há nada marcado. Dizes o que te apetece fazer, quem estiver livre responde e combinam.</div>
+        <div class="ch-e">Ex.: escalar quinta à noite em Marvila</div>
+      </div>
+      <span class="ico ch-c" data-i="chev"></span>
+    </button>
+  </div>
+
+  <!-- ABRIR VAGAS -->
+  <div class="screen" id="s-criar">
+    <button class="back" onclick="go('publicar')"><span class="ico" data-i="back"></span>Voltar</button>
+    <div class="h1">Abrir vagas</div>
+    <div class="sub">Tens o plano feito: diz onde, quando e quantos lugares há.</div>
+    <div class="panel">
+      <div class="label">Desporto</div>
+      <div class="seg" id="sportSeg"></div>
+      <div class="label">Título</div>
+      <input class="field" id="fTitle" placeholder="Ex.: Futebol 5 ao fim do dia">
+      <div class="label">Descrição <span style="font-weight:500;color:var(--muted)">(opcional)</span></div>
+      <textarea class="field" id="fDesc" maxlength="160" placeholder="Ex.: Jogo descontraído, nível casual. Traz colete escuro; a bola é nossa."></textarea>
+      <div class="count" id="fDescCount">0/160</div>
+      <div class="label" style="margin-top:8px;">Local</div>
+      <input class="field" id="fPlace" placeholder="Ex.: Campo de Campolide">
+      <div class="two">
+        <div><div class="label">Dia e hora</div><input class="field" id="fTime" placeholder="Terça, 21:00"></div>
+        <div><div class="label">Lugares (contigo)</div><input class="field" id="fSpots" type="number" min="2" max="22" value="10"></div>
+      </div>
+      <div class="label">Custo total do espaço (€)</div>
+      <input class="field" id="fCost" type="number" min="0" step="1" value="40">
+      <div class="hint"><span class="ico" data-i="euro"></span><span id="fSplit"></span></div>
+      <button class="btn pri wide" id="publish">Publicar vagas</button>
+    </div>
+  </div>
+
+  <!-- PROCURAR COMPANHIA -->
+  <div class="screen" id="s-pedir">
+    <button class="back" onclick="go('publicar')"><span class="ico" data-i="back"></span>Voltar</button>
+    <div class="h1">Procurar companhia</div>
+    <div class="sub">Ainda sem nada marcado? Diz o que queres fazer e quem estiver livre responde.</div>
+    <div class="panel">
+      <div class="label">Quero ir fazer</div>
+      <div class="seg" id="reqSport"></div>
+      <div class="two" style="margin-top:2px;">
+        <div><div class="label">Quando dava jeito</div><input class="field" id="rWhen" placeholder="Quinta, 19:00"></div>
+        <div><div class="label">O meu nível</div>
+          <select class="field" id="rLevel"><option>Iniciante</option><option selected>Intermédio</option><option>Avançado</option></select></div>
+      </div>
+      <div class="label">Zona ou local</div>
+      <input class="field" id="rWhere" placeholder="Ex.: ginásio de escalada em Marvila">
+      <div class="label">Descrição <span style="font-weight:500;color:var(--muted)">(opcional)</span></div>
+      <textarea class="field" id="rDesc" maxlength="160" placeholder="Ex.: Quero fazer vias de corda e preciso de quem me segure. Tenho equipamento."></textarea>
+      <div class="count" id="rDescCount">0/160</div>
+      <button class="btn pri wide" style="margin-top:8px;" id="rPublish">Publicar procura</button>
+    </div>
+  </div>
+
+  <!-- LOCAIS -->
+  <div class="screen" id="s-locais">
+    <div class="h1">Onde praticar</div>
+    <div class="sub">Instalações por perto e quanto fica por pessoa quando dividem o custo.</div>
+    <div class="minimap" id="minimap"></div>
+    <div class="chips" id="placeFilters"></div>
+    <div style="height:8px"></div>
+    <div id="places"></div>
+    <div class="note" style="margin-top:4px;">Preços de exemplo. No MVP a reserva faz-se no próprio local ou na app de reservas dele; a Convoca junta as pessoas e mostra a divisão do custo.</div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="screen" id="s-perfil">
+    <div class="h1">Perfil</div>
+    <div style="height:10px"></div>
+    <div class="card">
+      <div class="cb pcard">
+        <div class="pav">R</div>
+        <div>
+          <div class="pname">Rodrigo</div>
+          <div class="meta">Lisboa · membro desde 2026</div>
+          <span class="verified"><span class="ico" data-i="shield"></span>Telemóvel verificado</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="stMine">0</b><span>marcadas</span></div>
+        <div class="stat"><b>12/12</b><span>compareceu</span></div>
+        <div class="stat"><b style="color:var(--ok)">100%</b><span>fiabilidade</span></div>
+      </div>
+    </div>
+    <div class="note">A fiabilidade é a percentagem de encontros a que foste. Aparece no teu nome quando te juntas a um grupo ou respondes a alguém.</div>
+    <div class="sec"><h3>Os meus desportos</h3><span>3</span></div>
+    <div class="card list" id="mySports"></div>
+    <div class="sec"><h3>A minha agenda</h3><span id="mineCount"></span></div>
+    <div id="mine"></div>
+  </div>
+
+  <button class="fab show" id="fab" onclick="go('publicar')"><span class="ico" data-i="plus"></span>Publicar</button>
+  <div class="toast" id="toast"><span class="ico" data-i="check"></span><span id="toastTxt"></span></div>
+
+  <div class="tabs">
+    <button class="tab on" data-s="perto"><span class="ic" data-i="compass"></span><span class="tl">Explorar</span></button>
+    <button class="tab" data-s="locais"><span class="ic" data-i="map"></span><span class="tl">Locais</span></button>
+    <button class="tab" data-s="perfil"><span class="ic" data-i="user"></span><span class="tl">Perfil</span></button>
+  </div>
+</div>
+
+<script>
+const ICONS={
+  escalada:'<path d="M2.5 20.5 9 9l3.6 6 2.4-3.6 6.5 9.1z"/><path d="M9 9l1.6 2.8 1.6-1"/><circle cx="17.5" cy="5" r="1.6"/>',
+  padel:'<g transform="rotate(-40 12 12)"><path d="M12 2.6c3.4 0 6 2.6 6 6.2 0 3.1-1.9 5.6-4.4 6.5v1.9h-3.2v-1.9C7.9 14.4 6 11.9 6 8.8c0-3.6 2.6-6.2 6-6.2z"/><path d="M10.4 17.2h3.2v3.4a1.6 1.6 0 0 1-3.2 0z"/><path d="M9.9 6.5h.01M14.1 6.5h.01M12 9.2h.01M9.9 11.9h.01M14.1 11.9h.01" stroke-width="2"/></g><circle cx="19.2" cy="5" r="2"/>',
+  futebol:'<circle cx="12" cy="12" r="9"/><path d="m12 7.6 3.2 2.3-1.2 3.7h-4L8.8 9.9z"/><path d="M12 3v4.6M15.2 9.9l4.6-1.5M14 13.6l2.9 3.9M10 13.6l-2.9 3.9M8.8 9.9 4.2 8.4"/>',
+  corrida:'<circle cx="15" cy="4.2" r="1.9"/><path d="m8 10.5 3.6-2.6 3.1 1.2 1.6 2.9 3 .6"/><path d="m11.6 7.9-1.8 5.6 3.6 2.4-1 5"/><path d="M9.8 13.5 7.4 17H3.5"/>',
+  tenis:'<ellipse cx="9.5" cy="9.5" rx="5.6" ry="6.4" transform="rotate(-45 9.5 9.5)"/><path d="M6.2 9.2 9.8 5.6M7.4 12.4l5-5M10.6 13.4l2.8-2.8M13.6 13.6 20.5 20.5"/><circle cx="19" cy="5" r="2.2"/>',
+  volei:'<circle cx="12" cy="12" r="9"/><path d="M12 3c-1.8 3-1.8 6.2 0 9 3.2.2 6.1-1.3 8-3.9"/><path d="M12 12c-1.6 2.8-4.3 4.5-7.8 4.6M12 12c1.7 2.8 4.5 4.4 7.9 4.4"/>',
+  ciclismo:'<circle cx="6" cy="16" r="3.6"/><circle cx="18" cy="16" r="3.6"/><path d="m6 16 4-7h5.2L18 16M10 9l3 7H6M14 5.8h2.6l-1.4 3.2"/>'
+};
+const UI={
+  pin:'<path d="M12 21s-7-6.1-7-11.2A7 7 0 0 1 19 9.8C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.6"/>',
+  bubble:'<path d="M4.5 5.5h15v10h-9l-4.5 4v-4h-1.5z"/><path d="M12 8.2v4.6M9.7 10.5h4.6"/>',
+  map:'<path d="m3.5 6.5 5.5-2 6 2 5.5-2v13l-5.5 2-6-2-5.5 2z"/><path d="M9 4.5v13M15 6.5v13"/>',
+  user:'<circle cx="12" cy="8.2" r="3.8"/><path d="M4.5 20.5c.8-4 3.8-6.3 7.5-6.3s6.7 2.3 7.5 6.3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="m15.6 8.4-2.1 5.1-5.1 2.1 2.1-5.1z"/>',
+  bell:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  level:'<path d="M5 19v-4M10 19V11M15 19V7M20 19V4" />',
+  check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  back:'<path d="m14.5 6-6 6 6 6"/>',
+  shield:'<path d="M12 3.5 19 6v5.5c0 4.3-3 7.7-7 9-4-1.3-7-4.7-7-9V6z"/><path d="m9 12 2.2 2.2L15.2 10"/>',
+  euro:'<path d="M17.5 6.5A6.5 6.5 0 0 0 7 12a6.5 6.5 0 0 0 10.5 5.5"/><path d="M4.5 10.5h8M4.5 13.5h7"/>',
+  users:'<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5c.6-3.3 2.8-5.2 5.5-5.2s4.9 1.9 5.5 5.2"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 5.8M17.5 14.6c1.6.7 2.7 2.4 3 4.9"/>',
+  calendar:'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>'
+};
+const TINT={escalada:['#E6EEE1','#1F4D33'],padel:['#FBE7DF','#B23A10'],futebol:['#E2EDE6','#1F4D33'],corrida:['#EEF3DA','#4D6B12'],tenis:['#F8F0D6','#7A5800'],volei:['#E1EAF5','#1E4E8C'],ciclismo:['#ECE6F5','#5B3A8C']};
+const AVC=['#0F3D2E','#B23A10','#1E4E8C','#5B3A8C','#7A5800','#2C7A4B'];
+const svg=(d,col)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${col||'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const sic=(k,col)=>svg(ICONS[k],col);
+const ui=k=>`<span class="ico">${svg(UI[k])}</span>`;
+const tile=k=>`<div class="tile" style="background:${TINT[k][0]}">${sic(k,TINT[k][1])}</div>`;
+const SPORTS=[
+  {k:'escalada',l:'Escalada'},{k:'padel',l:'Padel'},{k:'futebol',l:'Futebol'},
+  {k:'corrida',l:'Corrida'},{k:'tenis',l:'Ténis'},{k:'volei',l:'Voleibol'},{k:'ciclismo',l:'Ciclismo'}
+];
+const S=k=>SPORTS.find(s=>s.k===k);
+
+// sessões abertas (grupo)
+let ACTS=[
+  {id:1,k:'futebol',t:'Futebol 5 depois do trabalho',d:'Jogo descontraído, nível casual. Traz colete escuro; a bola é nossa.',p:'Campo de Campolide',time:'Ter 21:00',lvl:'Casual',tot:10,fil:8,cost:40},
+  {id:2,k:'padel',t:'Padel a pares',d:'Somos três de nível intermédio e procuramos o quarto para uma partida.',p:'Clube em Alvalade',time:'Amanhã 20:30',lvl:'Intermédio',tot:4,fil:3,cost:24},
+  {id:3,k:'escalada',t:'Boulder para iniciantes',d:'Sessão para quem está a começar. Há aluguer de sapatos no local.',p:'Ginásio de escalada · Marvila',time:'Hoje 19:00',lvl:'Iniciante',tot:6,fil:3,cost:0,entry:12},
+  {id:4,k:'corrida',t:'Corrida fácil 8 km',d:'Ritmo de conversa, cerca de 6:00 min/km. Encontro junto ao Oceanário.',p:'Parque das Nações',time:'Sáb 09:00',lvl:'Todos os níveis',tot:12,fil:7,cost:0},
+  {id:5,k:'volei',t:'Vólei de praia',d:'2x2 ou 4x4 consoante quem aparecer. A rede já está montada.',p:'Carcavelos',time:'Dom 10:00',lvl:'Intermédio',tot:8,fil:5,cost:0},
+  {id:6,k:'ciclismo',t:'Saída de 40 km',d:'Volta por Monsanto com subidas moderadas. Capacete obrigatório.',p:'Monsanto',time:'Sáb 08:00',lvl:'Intermédio',tot:8,fil:4,cost:0}
+];
+// pedidos de parceiro (1 pessoa)
+let REQS=[
+  {id:101,k:'escalada',by:'Ana',i:'A',rel:98,when:'Quinta, 19:00',lvl:'Intermédio',where:'Ginásio em Marvila',d:'Quero fazer vias de corda e preciso de quem me segure. Tenho equipamento e curso de segurança.'},
+  {id:102,k:'tenis',by:'Miguel',i:'M',rel:100,when:'Sábado, 10:00',lvl:'Intermédio',where:'Estádio Universitário',d:'Jogo de treino, sem pressão. Eu reservo o campo e dividimos os €14.'},
+  {id:103,k:'corrida',by:'Sofia',i:'S',rel:95,when:'Seg/Qua, 07:00',lvl:'5:30 min/km',where:'Parque das Nações',d:'A preparar a meia maratona. Procuro alguém para os treinos da manhã.'},
+  {id:104,k:'padel',by:'João',i:'J',rel:92,when:'Terça, 20:00',lvl:'Iniciante',where:'Qualquer clube perto de Alvalade',d:'Comecei há pouco. Procuro alguém com nível parecido para formarmos dupla.'}
+];
+// locais (instalações)
+const PLACES=[
+  {k:'futebol',n:'Campo de futebol 5',z:'Campolide',price:40,unit:'hora',people:10,dist:'1,1 km'},
+  {k:'padel',n:'Campo de padel coberto',z:'Alvalade',price:24,unit:'hora e meia',people:4,dist:'2,3 km'},
+  {k:'tenis',n:'Campo de ténis',z:'Estádio Universitário',price:14,unit:'hora',people:2,dist:'2,6 km'},
+  {k:'escalada',n:'Ginásio de escalada (boulder)',z:'Marvila',price:12,unit:'entrada',people:1,dist:'4,0 km',perEntry:true},
+  {k:'volei',n:'Rede de vólei de praia',z:'Carcavelos',price:0,unit:'',people:8,dist:'14 km'},
+  {k:'corrida',n:'Percurso ribeirinho',z:'Parque das Nações',price:0,unit:'',people:1,dist:'5,2 km'}
+];
+UI.chev='<path d="m9.5 6 6 6-6 6"/>';
+UI.usearch='<circle cx="10" cy="8" r="3.5"/><path d="M3.5 19.5c.7-3.6 3.3-5.6 6.5-5.6"/><circle cx="17" cy="16.5" r="3"/><path d="m19.2 18.7 2 2"/>';
+
+const joined=new Set(); const answered=new Set(); const myReqs=[];
+let filter='todos', kind='tudo', placeFilter='todos', newSport='futebol', reqSport='escalada', query='';
+const $=s=>document.querySelector(s);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const eur=v=>'€'+(Math.round(v*100)/100).toFixed(2).replace('.',',').replace(',00','');
+function toast(m){const t=$('#toast');$('#toastTxt').textContent=m;t.classList.add('show');clearTimeout(t._);t._=setTimeout(()=>t.classList.remove('show'),2400);}
+function priceLine(a){
+  if(a.entry) return 'Entrada '+eur(a.entry);
+  if(!a.cost) return 'Gratuito';
+  return eur(a.cost/a.tot)+' por pessoa';
+}
+function priceBox(a){
+  if(a.entry) return `<div class="price"><b>${eur(a.entry)}</b><span>entrada</span></div>`;
+  if(!a.cost) return `<div class="price free"><b>Grátis</b><span>sem custo</span></div>`;
+  return `<div class="price"><b>${eur(a.cost/a.tot)}</b><span>por pessoa</span></div>`;
+}
+function stack(n,seed){
+  const L='ABCDEFGHIJLMNPRST';let h='';
+  for(let i=0;i<Math.min(3,n);i++){h+=`<span style="background:${AVC[(seed+i)%AVC.length]}">${L[(seed*3+i*5)%L.length]}</span>`;}
+  return `<div class="stack">${h}</div>`;
+}
+function chipRow(box,list,cur,onPick){
+  box.innerHTML='';
+  list.forEach(s=>{const c=document.createElement('button');c.className='chip'+(cur===s.k?' sel':'');
+    c.innerHTML=(ICONS[s.k]?'<span class="ico">'+sic(s.k)+'</span>':'')+s.l;c.onclick=()=>onPick(s.k);box.appendChild(c);});
+}
+const KIND={g:`<div class="kind g">${ui('users')}Grupo com vagas</div>`, p:`<div class="kind p">${ui('usearch')}Procura parceiro</div>`};
+
+// ---- cartões ----
+function sessCard(a){
+  const left=a.tot-a.fil, isIn=joined.has(a.id), full=left<=0;
+  const card=document.createElement('div');card.className='card';
+  card.innerHTML=`
+    <div class="cb">${KIND.g}
+      <div class="row">${tile(a.k)}
+        <div style="flex:1;min-width:0;"><div class="ctitle">${esc(a.t)}</div><div class="meta">${esc(a.p)}</div></div>
+        ${priceBox(a)}
+      </div>
+      ${a.d?'<div class="desc">'+esc(a.d)+'</div>':''}
+      <div class="tags"><span class="t">${ui('clock')}${esc(a.time)}</span><span class="t">${ui('level')}${a.lvl}</span><span class="t${full?'':(left<=2?' hot':'')}">${ui('users')}${full?'Completo':(left===1?'Falta 1 vaga':'Faltam '+left+' vagas')}</span>${isIn?'<span class="t me">Vais</span>':''}</div>
+    </div>
+    <div class="foot">
+      <div class="prog"><div class="prog-top">${stack(a.fil,a.id)}<span><b>${a.fil}</b> de ${a.tot} confirmados</span></div>
+        <div class="bar"><i style="width:${Math.round(a.fil/a.tot*100)}%"></i></div></div>
+      <button class="btn ${isIn?'done':(full?'off':'pri')}">${isIn?ui('check')+'Confirmado':(full?'Completo':'Juntar-me')}</button>
+    </div>`;
+  if(!isIn&&!full){card.querySelector('button').onclick=()=>{a.fil++;joined.add(a.id);renderFeed();renderMine();toast('Estás dentro: '+a.t);};}
+  return card;
+}
+function reqCard(r){
+  const mine=r.mine, done=answered.has(r.id);
+  const card=document.createElement('div');card.className='card';
+  card.innerHTML=`
+    <div class="cb">${KIND.p}
+      <div class="who" style="margin-bottom:14px;">
+        <div class="av" style="background:${mine?'var(--primary)':AVC[(r.id)%AVC.length]}">${r.i}</div>
+        <div><div class="who-n">${mine?'A tua procura':r.by+' procura companhia'}</div>
+          <div class="who-s">${mine?'publicada agora':ui('shield')+'<span class="rel">'+r.rel+'% fiável</span>'}</div></div>
+      </div>
+      <div class="row">${tile(r.k)}
+        <div style="flex:1;min-width:0;"><div class="ctitle">${S(r.k).l}</div><div class="meta">${esc(r.where)}</div></div>
+      </div>
+      ${r.d?'<div class="desc">'+esc(r.d)+'</div>':''}
+      <div class="tags"><span class="t">${ui('clock')}${esc(r.when)}</span><span class="t">${ui('level')}${r.lvl}</span></div>
+    </div>
+    <div class="foot">
+      ${mine?`<span class="prog-top">${ui('users')}${r.resp?'<span><b>'+r.resp+'</b> pessoas alinham</span>':'<span>À espera de respostas</span>'}</span><button class="btn out">Ver</button>`:
+        `<span class="prog-top">Ainda sem plano fechado</span><button class="btn ${done?'done':'pri'}">${done?ui('check')+'Respondeste':'Eu alinho'}</button>`}
+    </div>`;
+  const b=card.querySelector('button');
+  if(mine){b.onclick=()=>toast(r.resp?'A Inês e o Tiago alinham. Combinem os detalhes.':'Ainda sem respostas.');}
+  else if(!done){b.onclick=()=>{answered.add(r.id);renderFeed();renderMine();toast(r.by+' recebeu a tua resposta. Combinem os detalhes.');};}
+  return card;
+}
+
+// ---- Explorar ----
+function renderFeed(){
+  chipRow($('#filters'),[{k:'todos',l:'Todos'}].concat(SPORTS),filter,k=>{filter=k;renderFeed();});
+  document.querySelectorAll('#kindSeg button').forEach(b=>b.classList.toggle('on',b.dataset.k===kind));
+  const q=query.toLowerCase(), sp=x=>filter==='todos'||x.k===filter;
+  const ss=kind==='parceiro'?[]:ACTS.filter(a=>sp(a)&&(!q||(a.t+' '+a.p+' '+(a.d||'')+' '+S(a.k).l).toLowerCase().includes(q)));
+  const rr=kind==='grupo'?[]:myReqs.concat(REQS).filter(r=>sp(r)&&(!q||(r.where+' '+(r.d||'')+' '+r.by+' '+S(r.k).l).toLowerCase().includes(q)));
+  const feed=$('#feed'); feed.innerHTML='';
+  const n=ss.length+rr.length;
+  $('#count').textContent=n+(n===1?' resultado':' resultados');
+  if(!n){feed.innerHTML=`<div class="empty">${ui('calendar')}Nada por aqui ainda.<br>Toca em Publicar para começares tu.</div>`;return;}
+  const mineFirst=rr.filter(r=>r.mine), others=rr.filter(r=>!r.mine);
+  mineFirst.forEach(r=>feed.appendChild(reqCard(r)));
+  for(let i=0;i<Math.max(ss.length,others.length);i++){ if(ss[i])feed.appendChild(sessCard(ss[i])); if(others[i])feed.appendChild(reqCard(others[i])); }
+}
+document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>{kind=b.dataset.k;renderFeed();});
+$('#q').addEventListener('input',e=>{query=e.target.value.trim();renderFeed();});
+
+// ---- Procurar companhia ----
+function renderReqForm(){ chipRow($('#reqSport'),SPORTS,reqSport,k=>{reqSport=k;renderReqForm();}); }
+$('#rPublish').onclick=()=>{
+  const r={id:Date.now()%100000,k:reqSport,by:'Tu',i:'R',mine:true,resp:0,
+    when:$('#rWhen').value.trim()||'Esta semana',lvl:$('#rLevel').value,where:$('#rWhere').value.trim()||'Lisboa',d:$('#rDesc').value.trim()};
+  myReqs.unshift(r); $('#rWhen').value='';$('#rWhere').value='';$('#rDesc').value='';$('#rDescCount').textContent='0/160';
+  filter='todos'; kind='tudo'; renderFeed(); renderMine(); go('perto');
+  toast('Procura publicada. Avisamos quem pratica '+S(reqSport).l.toLowerCase()+' por perto.');
+  setTimeout(()=>{r.resp=2;renderFeed();toast('2 pessoas alinham na tua procura');},2800);
+};
+
+// ---- Locais ----
+function renderPlaces(){
+  chipRow($('#placeFilters'),[{k:'todos',l:'Todos'}].concat(SPORTS),placeFilter,k=>{placeFilter=k;renderPlaces();});
+  const box=$('#places'); box.innerHTML='';
+  const list=PLACES.filter(p=>placeFilter==='todos'||p.k===placeFilter);
+  if(!list.length){box.innerHTML=`<div class="empty">${ui('map')}Sem locais registados para esta modalidade.</div>`;return;}
+  list.forEach(p=>{
+    const per = p.price===0 ? null : (p.perEntry ? p.price : p.price/p.people);
+    const card=document.createElement('div');card.className='card';
+    card.innerHTML=`
+      <div class="cb">
+        <div class="row">${tile(p.k)}
+          <div style="flex:1;min-width:0;"><div class="ctitle">${p.n}</div><div class="meta">${p.z} · ${p.dist}</div></div>
+          ${per===null?'<div class="price free"><b>Grátis</b><span>espaço público</span></div>':'<div class="price"><b>'+eur(per)+'</b><span>por pessoa</span></div>'}
+        </div>
+        <div class="tags">${per===null?'<span class="t">'+ui('users')+'Sem reserva</span>':
+          (p.perEntry?'<span class="t">'+ui('users')+'Cada um paga a sua entrada</span>':'<span class="t">'+ui('euro')+eur(p.price)+' por '+p.unit+'</span><span class="t">'+ui('users')+'a dividir por '+p.people+'</span>')}</div>
+      </div>
+      <div class="foot"><span class="prog-top">${p.perEntry||per===null?'Junta-te a quem vai':'Junta '+p.people+' pessoas e paga menos'}</span>
+        <button class="btn out">Abrir vagas aqui</button></div>`;
+    card.querySelector('button').onclick=()=>{newSport=p.k;renderSportSeg();$('#fPlace').value=p.n+' · '+p.z;$('#fSpots').value=p.people>1?p.people:4;$('#fCost').value=p.perEntry?0:p.price;updSplit();go('criar');};
+    box.appendChild(card);
+  });
+}
+
+// ---- Abrir vagas ----
+function renderSportSeg(){ chipRow($('#sportSeg'),SPORTS,newSport,k=>{newSport=k;renderSportSeg();}); }
+function updSplit(){
+  const tot=Math.max(2,Math.min(22,parseInt($('#fSpots').value)||2)), cost=Math.max(0,parseFloat($('#fCost').value)||0);
+  $('#fSplit').innerHTML = cost ? 'Cada pessoa paga <b>'+eur(cost/tot)+'</b> ('+eur(cost)+' a dividir por '+tot+').' : 'Sem custo de espaço: gratuito para todos.';
+}
+['#fSpots','#fCost'].forEach(id=>$(id).addEventListener('input',updSplit));
+$('#rDesc').addEventListener('input',e=>{$('#rDescCount').textContent=e.target.value.length+'/160';});
+$('#fDesc').addEventListener('input',e=>{$('#fDescCount').textContent=e.target.value.length+'/160';});
+$('#publish').onclick=()=>{
+  const tot=Math.max(2,Math.min(22,parseInt($('#fSpots').value)||10));
+  const a={id:Date.now()%100000,k:newSport,t:$('#fTitle').value.trim()||('Sessão de '+S(newSport).l.toLowerCase()),
+    p:$('#fPlace').value.trim()||'Lisboa',d:$('#fDesc').value.trim(),time:$('#fTime').value.trim()||'Esta semana',lvl:'Todos os níveis',
+    tot,fil:1,cost:Math.max(0,parseFloat($('#fCost').value)||0)};
+  ACTS.unshift(a); joined.add(a.id);
+  ['#fTitle','#fPlace','#fTime','#fDesc'].forEach(id=>$(id).value='');$('#fDescCount').textContent='0/160';
+  filter='todos'; kind='tudo'; renderFeed(); renderMine(); go('perto'); toast('Vagas publicadas. Já estás confirmado.');
+};
+
+// ---- Perfil ----
+function renderMine(){
+  const box=$('#mine');
+  const items=ACTS.filter(a=>joined.has(a.id)).map(a=>({k:a.k,t:a.t,m:a.time+' · '+priceLine(a)}))
+    .concat(REQS.filter(r=>answered.has(r.id)).map(r=>({k:r.k,t:S(r.k).l+' com '+r.by,m:r.when+' · a combinar'})))
+    .concat(myReqs.map(r=>({k:r.k,t:'A tua procura: '+S(r.k).l,m:r.when})));
+  $('#stMine').textContent=items.length;
+  $('#mineCount').textContent=items.length?items.length+(items.length===1?' marcada':' marcadas'):'';
+  if(!items.length){box.innerHTML=`<div class="card"><div class="empty">${ui('calendar')}Ainda não tens nada marcado.<br>Junta-te a um grupo ou publica uma procura.</div></div>`;return;}
+  box.innerHTML='<div class="card list">'+items.map(x=>`<div class="li">${tile(x.k)}<div style="min-width:0;"><div class="li-t">${esc(x.t)}</div><div class="li-m">${esc(x.m)}</div></div></div>`).join('')+'</div>';
+}
+
+function go(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+  $('#s-'+s).classList.add('on'); $('#s-'+s).scrollTop=0;
+  const tabS = ['publicar','criar','pedir'].includes(s) ? 'perto' : s;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.s===tabS));
+  $('#fab').classList.toggle('show',s==='perto');
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.s));
+
+document.querySelectorAll('[data-i]').forEach(el=>{el.innerHTML=svg(UI[el.dataset.i]);});
+$('#mySports').innerHTML=[['escalada','Escalada','Intermédio'],['padel','Padel','Iniciante'],['futebol','Futebol','Casual']]
+  .map(([k,t,l])=>`<div class="li">${tile(k)}<div class="li-t">${t}</div><span class="lvl">${l}</span></div>`).join('');
+// mini-mapa ilustrado (Lisboa estilizada, posições de exemplo)
+(function(){
+  const pins=[['futebol',120,70],['padel',196,52],['tenis',214,96],['escalada',300,78],['volei',44,118],['corrida',330,40]];
+  const pin=([k,x,y])=>`<g transform="translate(${x-14} ${y-34})"><ellipse cx="14" cy="34" rx="5" ry="1.6" fill="#0F1A15" fill-opacity=".15"/><path d="M14 33s-11-9.6-11-17.6a11 11 0 0 1 22 0C25 23.4 14 33 14 33z" fill="#fff" stroke="${TINT[k][1]}" stroke-width="1.6"/><svg x="7.5" y="8.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${TINT[k][1]}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg></g>`;
+  $('#minimap').innerHTML=`<svg viewBox="0 0 398 150" role="img" aria-label="Mapa ilustrado com os locais por perto">
+    <rect width="398" height="150" fill="#EEF1EE"/>
+    <path d="M0 132C70 118 120 140 190 126S320 104 398 116V150H0z" fill="#DCE6EC"/>
+    <rect x="248" y="24" width="70" height="44" rx="10" fill="#E0EADC"/>
+    <rect x="22" y="18" width="54" height="36" rx="10" fill="#E0EADC"/>
+    <g stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none">
+      <path d="M0 88H398"/><path d="M160 0V120"/><path d="M60 0l40 120"/><path d="M250 120 300 0"/>
+    </g>
+    <circle cx="176" cy="104" r="16" fill="#0F3D2E" fill-opacity=".1"/>
+    <circle cx="176" cy="104" r="6" fill="#0F3D2E" stroke="#fff" stroke-width="2.5"/>
+    ${pins.map(pin).join('')}
+  </svg>`;
+})();
+renderFeed(); renderReqForm(); renderPlaces(); renderSportSeg(); updSplit(); renderMine();
+</script>
+</body>
+</html>
