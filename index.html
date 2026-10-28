@@ -204,12 +204,12 @@
   <!-- EXPLORAR -->
   <div class="screen on" id="s-perto" style="padding-bottom:90px;">
     <div class="h1">Perto de ti</div>
-    <div class="sub">Grupos com vagas e pessoas à procura de companhia para treinar.</div>
+    <div class="sub">Grupos com vagas e propostas de treino perto de ti.</div>
     <label class="search"><span class="ico" data-i="search"></span><input id="q" placeholder="Procurar desporto, local ou descrição"></label>
     <div class="segc" id="kindSeg">
       <button data-k="tudo" class="on">Tudo</button>
       <button data-k="grupo">Grupos com vagas</button>
-      <button data-k="parceiro">Procuram parceiro</button>
+      <button data-k="parceiro">Propostas de treino</button>
     </div>
     <div class="chips" id="filters"></div>
     <div class="sec"><h3>Esta semana</h3><span id="count"></span></div>
@@ -231,10 +231,10 @@
       <span class="ico ch-c" data-i="chev"></span>
     </button>
     <button class="choice" onclick="go('pedir')">
-      <div class="tile" style="background:var(--accent-soft);color:var(--accent-ink)"><span class="ico" data-i="usearch" style="width:24px;height:24px"></span></div>
+      <div class="tile" style="background:var(--accent-soft);color:var(--accent-ink)"><span class="ico" data-i="calendar" style="width:24px;height:24px"></span></div>
       <div style="flex:1;">
-        <div class="ch-t">Quero companhia para ir</div>
-        <div class="ch-d">Ainda não há nada marcado. Dizes o que te apetece fazer, quem estiver livre responde e combinam.</div>
+        <div class="ch-t">Quero propor um treino</div>
+        <div class="ch-d">Ainda não há nada marcado. Propões o desporto, o dia e a zona; quem quiser ir junta-se e combinam os detalhes.</div>
         <div class="ch-e">Ex.: escalar quinta à noite em Marvila</div>
       </div>
       <span class="ico ch-c" data-i="chev"></span>
@@ -270,10 +270,10 @@
   <!-- PROCURAR COMPANHIA -->
   <div class="screen" id="s-pedir">
     <button class="back" onclick="go('publicar')"><span class="ico" data-i="back"></span>Voltar</button>
-    <div class="h1">Procurar companhia</div>
+    <div class="h1">Propor um treino</div>
     <div class="sub">Ainda sem nada marcado? Diz o que queres fazer e quem estiver livre responde.</div>
     <div class="panel">
-      <div class="label">Quero ir fazer</div>
+      <div class="label">Desporto</div>
       <div class="seg" id="reqSport"></div>
       <div class="two" style="margin-top:2px;">
         <div><div class="label">Quando dava jeito</div><input class="field" id="rWhen" placeholder="Quinta, 19:00"></div>
@@ -283,9 +283,9 @@
       <div class="label">Zona ou local</div>
       <input class="field" id="rWhere" placeholder="Ex.: ginásio de escalada em Marvila">
       <div class="label">Descrição <span style="font-weight:500;color:var(--muted)">(opcional)</span></div>
-      <textarea class="field" id="rDesc" maxlength="160" placeholder="Ex.: Quero fazer vias de corda e preciso de quem me segure. Tenho equipamento."></textarea>
+      <textarea class="field" id="rDesc" maxlength="160" placeholder="Ex.: Sessão de vias de corda, é preciso um par para fazer segurança. Tenho equipamento."></textarea>
       <div class="count" id="rDescCount">0/160</div>
-      <button class="btn pri wide" style="margin-top:8px;" id="rPublish">Publicar procura</button>
+      <button class="btn pri wide" style="margin-top:8px;" id="rPublish">Publicar proposta</button>
     </div>
   </div>
 
@@ -306,9 +306,9 @@
     <div style="height:10px"></div>
     <div class="card">
       <div class="cb pcard">
-        <div class="pav">R</div>
+        <div class="pav">D</div>
         <div>
-          <div class="pname">Rodrigo</div>
+          <div class="pname">Utilizador demo</div>
           <div class="meta">Lisboa · membro desde 2026</div>
           <span class="verified"><span class="ico" data-i="shield"></span>Telemóvel verificado</span>
         </div>
@@ -319,7 +319,7 @@
         <div class="stat"><b style="color:var(--ok)">100%</b><span>fiabilidade</span></div>
       </div>
     </div>
-    <div class="note">A fiabilidade é a percentagem de encontros a que foste. Aparece no teu nome quando te juntas a um grupo ou respondes a alguém.</div>
+    <div class="note">A fiabilidade é a percentagem de encontros a que foste. Aparece no teu nome quando te juntas a um grupo ou a um treino.</div>
     <div class="sec"><h3>Os meus desportos</h3><span>3</span></div>
     <div class="card list" id="mySports"></div>
     <div class="sec"><h3>A minha agenda</h3><span id="mineCount"></span></div>
@@ -387,10 +387,10 @@ let ACTS=[
 ];
 // pedidos de parceiro (1 pessoa)
 let REQS=[
-  {id:101,k:'escalada',by:'Ana',i:'A',rel:98,when:'Quinta, 19:00',lvl:'Intermédio',where:'Ginásio em Marvila',d:'Quero fazer vias de corda e preciso de quem me segure. Tenho equipamento e curso de segurança.'},
+  {id:101,k:'escalada',by:'Ana',i:'A',rel:98,when:'Quinta, 19:00',lvl:'Intermédio',where:'Ginásio em Marvila',d:'Sessão de vias de corda: é preciso um par para fazer segurança. Tenho equipamento e curso.'},
   {id:102,k:'tenis',by:'Miguel',i:'M',rel:100,when:'Sábado, 10:00',lvl:'Intermédio',where:'Estádio Universitário',d:'Jogo de treino, sem pressão. Eu reservo o campo e dividimos os €14.'},
-  {id:103,k:'corrida',by:'Sofia',i:'S',rel:95,when:'Seg/Qua, 07:00',lvl:'5:30 min/km',where:'Parque das Nações',d:'A preparar a meia maratona. Procuro alguém para os treinos da manhã.'},
-  {id:104,k:'padel',by:'João',i:'J',rel:92,when:'Terça, 20:00',lvl:'Iniciante',where:'Qualquer clube perto de Alvalade',d:'Comecei há pouco. Procuro alguém com nível parecido para formarmos dupla.'}
+  {id:103,k:'corrida',by:'Sofia',i:'S',rel:95,when:'Seg/Qua, 07:00',lvl:'5:30 min/km',where:'Parque das Nações',d:'Treinos para a meia maratona, ritmo de 5:30. Quem quiser aparecer é bem-vindo.'},
+  {id:104,k:'padel',by:'João',i:'J',rel:92,when:'Terça, 20:00',lvl:'Iniciante',where:'Qualquer clube perto de Alvalade',d:'Jogo a pares para quem começou há pouco. Nível iniciante, sem pressão.'}
 ];
 // locais (instalações)
 const PLACES=[
@@ -430,7 +430,7 @@ function chipRow(box,list,cur,onPick){
   list.forEach(s=>{const c=document.createElement('button');c.className='chip'+(cur===s.k?' sel':'');
     c.innerHTML=(ICONS[s.k]?'<span class="ico">'+sic(s.k)+'</span>':'')+s.l;c.onclick=()=>onPick(s.k);box.appendChild(c);});
 }
-const KIND={g:`<div class="kind g">${ui('users')}Grupo com vagas</div>`, p:`<div class="kind p">${ui('usearch')}Procura parceiro</div>`};
+const KIND={g:`<div class="kind g">${ui('users')}Grupo com vagas</div>`, p:`<div class="kind p">${ui('calendar')}Proposta de treino</div>`};
 
 // ---- cartões ----
 function sessCard(a){
@@ -460,7 +460,7 @@ function reqCard(r){
     <div class="cb">${KIND.p}
       <div class="who" style="margin-bottom:14px;">
         <div class="av" style="background:${mine?'var(--primary)':AVC[(r.id)%AVC.length]}">${r.i}</div>
-        <div><div class="who-n">${mine?'A tua procura':r.by+' procura companhia'}</div>
+        <div><div class="who-n">${mine?'A tua proposta':'Proposta de '+r.by}</div>
           <div class="who-s">${mine?'publicada agora':ui('shield')+'<span class="rel">'+r.rel+'% fiável</span>'}</div></div>
       </div>
       <div class="row">${tile(r.k)}
@@ -474,7 +474,7 @@ function reqCard(r){
         `<span class="prog-top">Ainda sem plano fechado</span><button class="btn ${done?'done':'pri'}">${done?ui('check')+'Respondeste':'Eu alinho'}</button>`}
     </div>`;
   const b=card.querySelector('button');
-  if(mine){b.onclick=()=>toast(r.resp?'A Inês e o Tiago alinham. Combinem os detalhes.':'Ainda sem respostas.');}
+  if(mine){b.onclick=()=>toast(r.resp?'2 pessoas querem ir. Combinem os detalhes.':'Ainda sem respostas.');}
   else if(!done){b.onclick=()=>{answered.add(r.id);renderFeed();renderMine();toast(r.by+' recebeu a tua resposta. Combinem os detalhes.');};}
   return card;
 }
@@ -497,15 +497,15 @@ function renderFeed(){
 document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>{kind=b.dataset.k;renderFeed();});
 $('#q').addEventListener('input',e=>{query=e.target.value.trim();renderFeed();});
 
-// ---- Procurar companhia ----
+// ---- Propor um treino ----
 function renderReqForm(){ chipRow($('#reqSport'),SPORTS,reqSport,k=>{reqSport=k;renderReqForm();}); }
 $('#rPublish').onclick=()=>{
-  const r={id:Date.now()%100000,k:reqSport,by:'Tu',i:'R',mine:true,resp:0,
+  const r={id:Date.now()%100000,k:reqSport,by:'Tu',i:'D',mine:true,resp:0,
     when:$('#rWhen').value.trim()||'Esta semana',lvl:$('#rLevel').value,where:$('#rWhere').value.trim()||'Lisboa',d:$('#rDesc').value.trim()};
   myReqs.unshift(r); $('#rWhen').value='';$('#rWhere').value='';$('#rDesc').value='';$('#rDescCount').textContent='0/160';
   filter='todos'; kind='tudo'; renderFeed(); renderMine(); go('perto');
-  toast('Procura publicada. Avisamos quem pratica '+S(reqSport).l.toLowerCase()+' por perto.');
-  setTimeout(()=>{r.resp=2;renderFeed();toast('2 pessoas alinham na tua procura');},2800);
+  toast('Proposta publicada. Avisamos quem pratica '+S(reqSport).l.toLowerCase()+' por perto.');
+  setTimeout(()=>{r.resp=2;renderFeed();toast('2 pessoas querem ir ao teu treino');},2800);
 };
 
 // ---- Locais ----
@@ -557,10 +557,10 @@ function renderMine(){
   const box=$('#mine');
   const items=ACTS.filter(a=>joined.has(a.id)).map(a=>({k:a.k,t:a.t,m:a.time+' · '+priceLine(a)}))
     .concat(REQS.filter(r=>answered.has(r.id)).map(r=>({k:r.k,t:S(r.k).l+' com '+r.by,m:r.when+' · a combinar'})))
-    .concat(myReqs.map(r=>({k:r.k,t:'A tua procura: '+S(r.k).l,m:r.when})));
+    .concat(myReqs.map(r=>({k:r.k,t:'A tua proposta: '+S(r.k).l,m:r.when})));
   $('#stMine').textContent=items.length;
   $('#mineCount').textContent=items.length?items.length+(items.length===1?' marcada':' marcadas'):'';
-  if(!items.length){box.innerHTML=`<div class="card"><div class="empty">${ui('calendar')}Ainda não tens nada marcado.<br>Junta-te a um grupo ou publica uma procura.</div></div>`;return;}
+  if(!items.length){box.innerHTML=`<div class="card"><div class="empty">${ui('calendar')}Ainda não tens nada marcado.<br>Junta-te a um grupo ou propõe um treino.</div></div>`;return;}
   box.innerHTML='<div class="card list">'+items.map(x=>`<div class="li">${tile(x.k)}<div style="min-width:0;"><div class="li-t">${esc(x.t)}</div><div class="li-m">${esc(x.m)}</div></div></div>`).join('')+'</div>';
 }
 
